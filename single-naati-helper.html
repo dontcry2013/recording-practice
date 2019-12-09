@@ -1,13 +1,3 @@
-<?php 
-	get_header();
-	$post_id = get_the_ID();
-    $custom_fields = get_post_custom($post_id);
-    $next_post_id = $custom_fields["next_link"][0];
-    if(!empty($next_post_id)){
-    	$next_link = get_permalink($next_post_id);	
-    }
-?>
-
 <style>
     .flex_center{
         display: -webkit-flex;
@@ -91,96 +81,135 @@
         }
     }
 </style>
-<?php include("inc/recorder.js") ?>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+<script src="recorder.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.2.3/wavesurfer.min.js"></script>
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-<!-- <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script> -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+<!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script> -->
 
-<!-- <div id="div_outer_most" class="flex_center"> -->
-    <div class="container-fluid">
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <div class="cls_head" style="margin-top: 22px">
-                    <a type="button" id="id_guide_btn" class="btn btn-danger cls_head_btn">
-                        <i class="glyphicon glyphicon-question-sign"></i>
+<div class="container-fluid">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="cls_head" style="margin-top: 22px">
+                <a type="button" id="id_guide_btn" class="btn btn-danger cls_head_btn">
+                    <i class="glyphicon glyphicon-question-sign"></i>
+                </a>
+                <div id="id_guide" class="cls_inline cls_inner_text" style="margin-left: 80px;">Purchasing a property</div>
+            </div>  
+        </div>
+        
+        <div class="panel-body" style="background-color: rgb(221, 221, 221);">
+            <div class="row" style="text-align: center">
+                <div>
+                    <audio id="id_audio" controls="controls" src="resource/Business-Dialogue-1.mp3"></audio>
+                </div>
+                <div>
+                    <a type="button" id="id_start_audio" class="btn btn-primary" onclick="document.querySelector('#id_audio').play();mAudio.ontimeupdate = undefined;">
+                        开始
                     </a>
-                    <div id="id_guide" class="cls_inline cls_inner_text" style="margin-left: 80px;"><?php echo $custom_fields['sp_title'][0] ?></div>
-                </div>  
+                    <a type="button" id="id_stop_audio" class="btn btn-primary" onclick="document.querySelector('#id_audio').pause();mAudio.ontimeupdate = timeUpateCb;">
+                        停止
+                    </a>
+                </div>
             </div>
-            
-            <div class="panel-body" style="background-color: rgb(221, 221, 221);">
-                <div class="row" style="text-align: center">
-                    <div>
-                        <audio id="id_audio" controls="controls" src="<?php echo wp_get_attachment_url($custom_fields['sp_audio'][0]) ?>"></audio>
+            <br>
+            <div class="col-lg-12 col-md-12">
+                <div style="text-align: center; vertical-align: middle;">
+                    <div id="id_tip" style="display: inline-block;">
+                        请准备
                     </div>
-                    <div>
-                        <a type="button" id="id_start_audio" class="btn btn-primary" onclick="document.querySelector('#id_audio').play();mAudio.ontimeupdate = undefined;">
-                            开始
-                        </a>
-                        <a type="button" id="id_stop_audio" class="btn btn-primary" onclick="document.querySelector('#id_audio').pause();mAudio.ontimeupdate = timeUpateCb;">
-                            停止
-                        </a>
+                    <div id="id_timer" style="display: inline-block;">
+                        00:00
                     </div>
                 </div>
-                <br>
-                <div class="col-lg-12 col-md-12">
-                    <div style="text-align: center; vertical-align: middle;">
-                        <div id="id_tip" style="display: inline-block;">
-                            请准备
-                        </div>
-                        <div id="id_timer" style="display: inline-block;">
-                            00:00
-                        </div>
-                    </div>
-                    <div class="" style="text-align: center">
-                        <a type="button" id="id_start_now" class="btn btn-primary">
-                            立即开始
-                        </a>
-                        <a type="button" id="id_start_again" class="btn btn-primary">
-                            重新开始
-                        </a>
-                        <a type="button" id="id_stop" class="btn btn-primary">
-                            停止
-                        </a>
-                        <a type="button" class="btn btn-primary" onclick="return location.href = '<?php echo $next_link ?>';">
-                            随机练习
-                        </a>
-                        <a type="button" class="btn btn-primary" onclick="return location.href = '<?php echo $next_link ?>';">
-                            下一个练习
-                        </a>
-                    </div>
-                    <blockquote style="font-size:12px;">全局快捷键：<b>空格</b>: 暂停／播放；<b>回车</b>：开始／结束录音；<b>shift</b>:播放最后一个录音；<b>左右方向键</b>：快退／快进；。
-                    </blockquote>  
+                <div class="" style="text-align: center">
+                    <a type="button" id="id_start_now" class="btn btn-primary">
+                        立即开始
+                    </a>
+                    <a type="button" id="id_start_again" class="btn btn-primary">
+                        重新开始
+                    </a>
+                    <a type="button" id="id_stop" class="btn btn-primary">
+                        停止
+                    </a>
+                    <a type="button" class="btn btn-primary" onclick="return location.href = 'https://google.com';">
+                        随机练习
+                    </a>
+                    <a type="button" class="btn btn-primary" onclick="return location.href = 'https://google.com';">
+                        下一个练习
+                    </a>
                 </div>
-                 <div>
-                    <h2>Recordings</h2>
-                    <div id="recordingslist"></div>
-                </div>
+                <blockquote style="font-size:12px;">全局快捷键：<b>空格</b>: 暂停／播放；<b>回车</b>：开始／结束录音；<b>shift</b>:播放最后一个录音；<b>左右方向键</b>：快退／快进；。
+                </blockquote>  
+            </div>
                 <div>
-                    <h2>Whiteboard</h2>
-                    <a type="button" class="btn btn-success" onclick="document.querySelector('#id_wb').style.display = document.querySelector('#id_wb').style.display == 'none'?'block':'none'">显示／隐藏</a>
-                    <a type="button" type="button" class="btn btn-primary" onclick="var b = document.querySelector('#id_ta').getAttribute('spellcheck')=='false'?'true':'false'; document.querySelector('#id_ta').setAttribute('spellcheck', b)">添加／取消拼写检查</a>
-                    <div id="id_wb" style="margin: 5px 0; display: none;">
-                        <textarea id="id_ta" rows="24" spellcheck="false" style="width:100%;" onfocusin="focusFunction()" onfocusout="loseFunction()"> </textarea>
-                    </div>
+                <h2>Recordings</h2>
+                <div id="recordingslist"></div>
+            </div>
+            <div>
+                <h2>Whiteboard</h2>
+                <a type="button" class="btn btn-success" onclick="document.querySelector('#id_wb').style.display = document.querySelector('#id_wb').style.display == 'none'?'block':'none'">显示／隐藏</a>
+                <a type="button" type="button" class="btn btn-primary" onclick="var b = document.querySelector('#id_ta').getAttribute('spellcheck')=='false'?'true':'false'; document.querySelector('#id_ta').setAttribute('spellcheck', b)">添加／取消拼写检查</a>
+                <div id="id_wb" style="margin: 5px 0; display: none;">
+                    <textarea id="id_ta" rows="24" spellcheck="false" style="width:100%;" onfocusin="focusFunction()" onfocusout="loseFunction()"> </textarea>
                 </div>
-                <div>
-                    <h2>Answer</h2>
-                    <pre id="answer" style="">
-                        <?php echo $custom_fields['sp_text'][0] ?>;
-                    </pre>
-                </div>
-                <div>
-                    <h2>Log</h2>
-                    <pre id="log"></pre>
-                </div>
+            </div>
+            <div>
+                <h2>Answer</h2>
+                <pre id="answer" style="">
+                    Dialogue 1
+Purchasing a property
+Trainer: Lou
+
+Briefing: Ms. Li is seeking advice from Ms. Jones, a representative from a company that builds and sells real estate properties about purchasing an apartment in Melbourne. 
+
+
+J: Welcome Ms. Li, please take a seat. My name is Anne Jones. I understand that you are interested in purchasing investment properties in Melbourne. How can I help you today?
+（欢迎你，李女士，请坐。我是安琼斯，我知道您想在墨尔本购买投资房。请问今天我们能为你做些什么？）
+
+L：是的，我儿子现在在这里的一所大学上学，他现在租了一间市中心的公寓，每月房租很贵，所以我想买一套公寓给他住，同时也能作为投资房。
+(Yes, my son is studying in a university here. He is renting an apartment in the city and paying quite a high rent every month. I am considering buying an apartment for him to live in and also as an investment property.)
+
+J: You can expect an excellent return if you buy the right apartment in the right location, and that’s why we are here to help you. We’ve been in real estate for over three decades, and we use leading builders to ensure quality right from the start of construction.
+（如果你在对的位置买了对的房子，那回报是很高的，所以我们今天就是在这方面帮你。我们公司做房地产这块已经有三十多年了，我们聘请领先的建筑商，从而从一开始就能保证质量。）
+
+L：我也知道地段很重要，我想买离市中心近的，这样我儿子上学比较方便，租出去也容易。我想这样的公寓增值应该也会比较快吧。你有没有这样的房子？
+(I am also aware of the importance of location. I am going for/after/prefer places close to the city so that it’s easier for my son to go to the university as well as for the apartment to be leased. I guess apartments like this will increase in their value more quickly. Do you have properties like this?)
+
+J: We have apartments in some of Melbourne’s finest inner suburbs that have seen big price increases in the recent years. There’s a trend towards living near the city or right in the city. I can’t see this changing in the next few years. 
+（我们在墨尔本市区最好的几个区有公寓，这些区域近几年房价都涨得厉害。现在人们都渐渐喜欢住在市中心附近或市中心里面。近几年内这应该不会变。）
+
+L：那些区离我儿子的大学近吗？这是我考虑的首要因素，我们中国人买房讲究“学区房”，这样以后就会源源不断的有学生来租。
+(Are those suburbs close to my son’s university? This is the top factor that I consider. / This is what I consider primarily. We Chinese prefer properties close to schools or universities./ When we Chinese buy houses or apartments, we need to see whether it is close to schools or universities, so that there will always be students to rent it.)
+
+J: Yes I understand what you are saying Ms. Li, we have a similar idea in Australia called “school zones”, but it’s for public primary or secondary schools that enroll students living within a certain distance. As for university, our company is just starting to build a project near your son’s university which is targeted at the student market.
+(我明白你的意思，李女士。我们澳洲也有类似的说法，叫“学区”，不过这是指公立中小学接收一定距离范围内的学生。如果是大学的话，我们公司正好要在你儿子的大学附近建一个新楼盘，就是针对学生市场的。)
+
+L：这听上去倒是不错。不过，我也听说针对学生的房子也有一定风险，万一澳洲的留学生减少了，我这房子是不是就租不出去了？而且要卖掉就更难了。
+(That sounds good, but I have also heard that there can be risks in/for properties…/apartments aimed at the student market can also be a risky investment. In case the number of international/overseas students decreases in Australia, will it be hard to lease my place? It may be even harder to sell it.)
+
+J: If you would like somewhere that can suit a bigger group, we also have some apartments that are completed and on the market. They are a lot more spacious, but the only thing is that they are already completed. If you buy off the plan before they are built, you won’t need to pay the stamp duty that is a state government tax.
+（如果你要能住下更多人的房子，我们也有一些已经造好的公寓，现在已经开始销售了。这些公寓要大很多，不过只有一个问题，这房子已经造好了。你要是在开始造之前买期房，那就不用付印花税了，就是交给州政府的一种税。）
+
+L：哦，我们在国内也要付印花税的，请问在这里印花税大概是多少？我得算一下房租贵还是印花税贵。
+(Oh, we also have to pay stamp duty in China. How much stamp duty do I pay?/What’s the approximate amount of stamp duty here? I need to see if the rent is higher or the stamp duty./if A is higher than B)
+
+J: It’s usually thousands of dollars, between 7 and 30 thousand, depending on the actual property you purchase. As far as I know, Victoria is the only state offering stamp duty exemption to purchasers who buy off the plan. 
+（一般是几千澳元，从七千到三万不等，视具体的房屋而定。据我所知，维多利亚州是唯一一个买期房可以免除印花税的州。）
+
+L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的房产吗？我想先去看看房。
+(Ok, I see. I’ll think about it. Could you please recommend a few suitable/appropriate places? I’d like to have an inspection/look first.)
+
+                </pre>
+            </div>
+            <div>
+                <h2>Log</h2>
+                <pre id="log"></pre>
             </div>
         </div>
     </div>
-<!-- </div> -->
-
+</div>
 
 <script>
     function __log(e, data) {
@@ -274,21 +303,20 @@
         });
     }
     
-    <?php if (!empty($custom_fields['sp_time'][0])) { ?>
-        arrTime = <?php echo $custom_fields['sp_time'][0] ?>;
-        console.log(arrTime);
-        latestBigger = arrTime[0];
-        var timeUpateCb = function() {
-            if (latestBigger && this.currentTime >= latestBigger) {
-                this.pause();
-                latestBigger = findLatestBigger(arrTime, mAudio.currentTime);
-            }
-        };
-        mAudio.ontimeupdate = timeUpateCb;
-        mAudio.onseeked = function() {
+
+    arrTime = [20.421073,37.376873,58.041864,79.59062,98.857683,116.456599,131.800714,157.178968,174.427127,198.583218,211.855144,229.49319,239.508334];
+    console.log(arrTime);
+    latestBigger = arrTime[0];
+    var timeUpateCb = function() {
+        if (latestBigger && this.currentTime >= latestBigger) {
+            this.pause();
             latestBigger = findLatestBigger(arrTime, mAudio.currentTime);
-        };
-    <?php  } ?>
+        }
+    };
+    mAudio.ontimeupdate = timeUpateCb;
+    mAudio.onseeked = function() {
+        latestBigger = findLatestBigger(arrTime, mAudio.currentTime);
+    };
 
     var gap = 3;
     function rewind(audioElement) {
@@ -612,13 +640,3 @@
 
 
 </script>
-
-<?php 
-get_footer();
-/*
-echo "<pre>";
-var_dump($custom_fields);
-echo $next_link;
-echo wp_get_attachment_url($custom_fields['sp_audio'][0]);
-echo "</pre>";
-?>
