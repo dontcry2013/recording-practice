@@ -1,0 +1,26 @@
+{
+  "name": "recording-practice",
+  "version": "1.0.0",
+  "description": "A practice to record voice, draw it to sound wave, to improve speaking fluency.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dontcry2013/recording-practice.git"
+  },
+  "keywords": [
+    "nodejs",
+    "voice",
+    "reording",
+    "sound",
+    "wave"
+  ],
+  "author": "Zac",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dontcry2013/recording-practice/issues"
+  },
+  "homepage": "https://github.com/dontcry2013/recording-practice#readme"
+}
