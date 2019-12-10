@@ -146,7 +146,7 @@
             </div>
             <div>
                 <h2>Answer</h2>
-                <pre id="answer" style="">
+                <pre id="answer">
                     Dialogue 1
 Purchasing a property
 Trainer: Lou
@@ -201,11 +201,12 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
 </div>
 
 <script>
+    var idx = 0, audio_context, recorder, isRecording = false;
+
     function __log(e, data) {
         log.innerHTML += "\n" + e + " " + (data || '');
     }
-    var audio_context;
-    var recorder, isRecording = false;
+
     function startUserMedia(stream) {
         var input = audio_context.createMediaStreamSource(stream);
         __log('Media stream created.');
@@ -216,11 +217,13 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
         recorder = new Recorder(input);
         __log('Recorder initialized.');
     }
+
     function startRecording() {
         isRecording = true;
         recorder && recorder.record();
         __log('Recording...');
     }
+
     function stopRecording(cb) {
         isRecording = false;
         recorder && recorder.stop();
@@ -228,7 +231,7 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
         cb();
         recorder.clear();
     }
-    var idx = 0;
+    
     window.onload = function init() {
         try {
           // webkit shim
@@ -236,7 +239,7 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
           navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
           window.URL = window.URL || window.webkitURL;
           
-          audio_context = new AudioContext;
+          audio_context = new AudioContext();
           __log('Audio context set up.');
           __log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
         } catch (e) {
@@ -249,12 +252,9 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
     };
 
     var tipSrc = "https://www.zacqin.top/wp-content/uploads/2017/10/readygo.ogg";
-    var tipAudio = new Audio(tipSrc);
     function playClip(startOffset, endOffset, playbackRate = 1, cbBefore, cbAfter) {
-        // if(tipAudio.readyState != 4){
-        //     return;
-        // }
         var tipAudio = new Audio(tipSrc);
+
         tipAudio.onloadedmetadata = function() {
             this.playbackRate = playbackRate;
             this.currentTime = startOffset;
@@ -272,18 +272,19 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
             }
         };
     }
+
     function goSound(cb){
         playClip(1.5, 1.5+0.7, 1, undefined, cb);
     }
+
     function readySound(cb){
         playClip(.6, .6+.7, 1, undefined, cb);
     }
+
     function completeSound(cb){
         playClip(3, 3+.9, 1, cb);
-    }
-    
+    } 
 
-    var latestBigger, arrTime;
     var mAudio = document.querySelector('#id_audio');
 
     function findLatestBigger(arr, point){
@@ -291,11 +292,10 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
             return elem > point;
         });
     }
-    
 
-    arrTime = [20.421073,37.376873,58.041864,79.59062,98.857683,116.456599,131.800714,157.178968,174.427127,198.583218,211.855144,229.49319,239.508334];
-    console.log(arrTime);
-    latestBigger = arrTime[0];
+    var arrTime = [20.421073,37.376873,58.041864,79.59062,98.857683,116.456599,131.800714,157.178968,174.427127,198.583218,211.855144,229.49319,239.508334];
+    var latestBigger = arrTime[0];
+
     var timeUpdateCb = function() {
         if (latestBigger && this.currentTime >= latestBigger) {
             this.pause();
@@ -321,6 +321,7 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
     var lastStopTime;
     function doc_keyDown(e) {
         console.log(e.keyCode);
+        e.preventDefault();
         switch(e.keyCode){
             case 13: //enter
                 if(!canResponse){
@@ -342,35 +343,29 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
                         jQuery("#id_stop").trigger("click");
                     });
                 }
-                e.preventDefault();
             break;
             case 16: //shift
                 var audio = jQuery("#recording_list>div:last-child audio")[0];
                 if(audio){
                     audio.paused ? audio.play() : audio.pause();
                 }
-                e.preventDefault();
             break;
             case 32: //space
                 if(!mAudio){
                     mAudio = document.querySelector('#id_audio');
                 }
                 mAudio.paused ? mAudio.play() : mAudio.pause();
-                e.preventDefault();
             break;
             case 37: //left
                 rewind(mAudio);
-                e.preventDefault();
             break;
             case 39: //right
                 fastForward(mAudio);
-                e.preventDefault();
             break;
             case 190: //>
                 goSound(function(){
                     console.log("er er er");
                 });
-                e.preventDefault();
             break;
             case 121: //f10
                 if(!mAudio){
@@ -383,7 +378,6 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
                 } else{
                     mAudio.pause();
                 }
-                e.preventDefault();
             break;
             case 122: //f11
                 if(!mAudio){
@@ -441,10 +435,9 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
     }
 
     jQuery(function($) {
-        console.log(123);
         var myTimer, mDuration = 10, mPrepareDuration = 3, display = $("#id_timer");
 
-        function startTimer(duration, display, cbBefore, cbAfter) {
+        var startTimer = function startAutoStopIntervalTimer (duration, display, cbBefore, cbAfter) {
             var timer = duration, minutes, seconds;
             var changeTag = function(){
                 minutes = parseInt(timer / 60, 10);
@@ -465,7 +458,7 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
                 changeTag();
                 if (timer <= 0) {
                     clearInterval(myTimer);
-                    if(cbAfter){
+                    if(cbAfter && (typeof cbAfter == 'function')){
                         cbAfter();    
                     }
                 }
@@ -474,10 +467,10 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
 
         var recording = function(dur, dom){
             startTimer(dur, dom, function(){
-                $("#id_tip").text("开始录音");
+                $("#id_tip").text("Start Recording");
                 startRecording(this);
             }, function(){
-                $("#id_tip").text("录音结束");
+                $("#id_tip").text("Stop Recording");
                 $("#id_start_now").prop("disabled", false);
                 $("#id_start_again").prop("disabled", false);
                 $("#id_stop").prop("disabled", false);
@@ -495,12 +488,6 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
                 recording(mDuration, display);
             });
         }
-
-        // startTimer(mDuration, display, function(){
-
-        // }, function(){
-        //     recording();
-        // });
 
         var $w = 0;
         function showWave(a,d){
@@ -534,7 +521,6 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
             }
             return false;
         }
-
         function createDownloadLink() {
             idx++;
             recorder && recorder.exportWAV(function(blob) {
@@ -580,7 +566,6 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
                 recording_list.appendChild(dv);
             });
         }
-
         $("#id_stop").click(function(){
             $("#id_tip").text("开始结束");
             $(this).prop("disabled", true);
@@ -614,17 +599,6 @@ L：哦，我知道了。那我考虑一下。你能给我介绍几处合适的�
             });
         });
 
-
-
     });
-
-
-
-
-
-
-
-
-
 
 </script>
